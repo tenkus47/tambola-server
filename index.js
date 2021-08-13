@@ -35,7 +35,6 @@ app.use(cors());
 app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.set("view engine", "ejs");
 
 app.get("/system/reboot", (req, res)=> {
 	process.exit(1)

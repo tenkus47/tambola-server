@@ -30,7 +30,15 @@ con.on("open", () => {
 });
 
 app.use("/GenerateTicket", TicketGenerate);
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    methods: "GET,POST",
+    allowedHeaders: "Content-Type,Authorization",
+    credentials: true,
+    preflightContinue: true,
+  })
+);
 app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -63,17 +71,17 @@ app.post("/createProfile", async (req, res) => {
   }
 });
 
-app.get("/getList",cors(), async (req, res) => {
+app.get("/getList", async (req, res) => {
   const data = await TambolaModel.find();
   res.json(data);
 });
 
-app.delete("/removeTicket",cors(), async (req, res) => {
+app.delete("/removeTicket", async (req, res) => {
   const { id } = req.query;
   const data = await TambolaModel.findByIdAndDelete(id);
 });
 
-app.get("/getList/:id",cors(), async (req, res) => {
+app.get("/getList/:id", async (req, res) => {
   const id = req.params.id;
   const data = await TambolaModel.find({ id });
   res.json(data);

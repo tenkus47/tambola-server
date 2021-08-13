@@ -9,10 +9,9 @@ const mongoose = require("mongoose");
 const TambolaModel = require("./models/uploadData");
 const ListModel = require("./models/ticketList");
 const WinnerModel=require('./models/winnerlist')
-const httpServer = require("http").createServer();
 var tambola = require("tambola");
 
-const io = require("socket.io")(httpServer, {
+const io = require("socket.io")(5000, {
   cors: {
     origin: "*",
   },
@@ -405,9 +404,6 @@ io.on("connection", (socket) => {
   
 });
 
-httpServer.listen(SOCKETPORT||5000, () => {
-  console.log("listening socket on port " + SOCKETPORT);
-});
 
 app.listen(PORT||process.env.PORT, () => {
   console.log("listening at PORT : " + PORT);

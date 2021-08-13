@@ -64,17 +64,17 @@ app.post("/createProfile", async (req, res) => {
   }
 });
 
-app.get("/getList", async (req, res) => {
+app.get("/getList",cors(), async (req, res) => {
   const data = await TambolaModel.find();
   res.json(data);
 });
 
-app.delete("/removeTicket", async (req, res) => {
+app.delete("/removeTicket",cors(), async (req, res) => {
   const { id } = req.query;
   const data = await TambolaModel.findByIdAndDelete(id);
 });
 
-app.get("/getList/:id", async (req, res) => {
+app.get("/getList/:id",cors(), async (req, res) => {
   const id = req.params.id;
   const data = await TambolaModel.find({ id });
   res.json(data);

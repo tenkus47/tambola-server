@@ -1,6 +1,6 @@
 const express = require("express");
 // import process from 'process'
-const { PORT, SOCKETPORT } = require("./config");
+const {  SOCKETPORT } = require("./config");
 const app = express();
 var bodyParser = require("body-parser");
 const TicketGenerate = require("./Route/TicketGenerate");
@@ -405,10 +405,10 @@ io.on("connection", (socket) => {
   
 });
 
-httpServer.listen(SOCKETPORT, () => {
+httpServer.listen(SOCKETPORT||5000, () => {
   console.log("listening socket on port " + SOCKETPORT);
 });
 
-app.listen(PORT, () => {
+app.listen(PORT||process.env.PORT, () => {
   console.log("listening at PORT : " + PORT);
 });

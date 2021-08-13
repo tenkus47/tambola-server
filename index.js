@@ -73,7 +73,7 @@ app.post("/createProfile", async (req, res) => {
 
 app.get("/getList", async (req, res) => {
   const data = await TambolaModel.find();
-  res.send('hi');
+  res.json(data);
 });
 
 app.delete("/removeTicket", async (req, res) => {

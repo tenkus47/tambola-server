@@ -33,7 +33,7 @@ app.use("/GenerateTicket", TicketGenerate);
 app.use(
   cors({
     origin: "*",
-    methods: "GET,POST",
+    methods: "GET,POST,DELETE",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true,
     preflightContinue: true,

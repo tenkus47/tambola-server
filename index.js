@@ -324,21 +324,18 @@ return {q5winner,tempwinner,fourcornerWinner,firstlineWinner,secondlineWinner,th
 };
 let pricesetter=(price)=>{
   var deduct=price-(price*0.10)
- var fullhouseP=deduct*0.25;
- var firstlineP=deduct*0.15;
- var thirdlineP=deduct*0.15;
- var secondlineP=deduct*0.15;
- var quick5P=deduct*0.10;
- var fourcornerP=deduct*0.10;
- var temperatureP=deduct*0.05;
+ var fullhouseP=Math.floor(deduct*0.25);
+ var firstlineP=Math.floor(deduct*0.15);
+ var thirdlineP=Math.floor(deduct*0.15);
+ var secondlineP=Math.floor(deduct*0.15);
+ var quick5P=Math.floor(deduct*0.10);
+ var fourcornerP=Math.floor(deduct*0.10);
+ var temperatureP=Math.floor(deduct*0.05);
   return {fullhouseP,firstlineP,thirdlineP,secondlineP,quick5P,fourcornerP,temperatureP}
 }
 console.log(process.pid)
 io.on("connection", (socket) => {
 
-  socket.on("disconnect", () => {
-    console.log("disconnected");
-  });
   var list = [];
 
   socket.on("starts", async (data,price) => {

@@ -409,6 +409,10 @@ io.on("connection", (socket) => {
     console.log(message)
      socket.broadcast.emit('gotoend' ,message);
   })
+  process.on('beforeExit',()=>{
+    const msg='server getting restarted';
+    socket.broadcast.emit('serverdown',msg);
+  })
   
 });
 

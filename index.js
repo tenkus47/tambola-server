@@ -1,7 +1,7 @@
 const express = require("express");
-// import process from 'process'
-const { PORT, SOCKETPORT } = require("./config");
+const { PORT} = require("./config");
 const app = express();
+const http=require('http')
 var bodyParser = require("body-parser");
 const TicketGenerate = require("./Route/TicketGenerate");
 const cors = require("cors");
@@ -11,7 +11,9 @@ const ListModel = require("./models/ticketList");
 const WinnerModel=require('./models/winnerlist')
 var tambola = require("tambola");
 
-const io = require("socket.io")(5000, {
+const server=http.createServer(app)
+
+const io = require("socket.io")(server, {
   cors: {
     origin: "*",
   },
@@ -413,6 +415,6 @@ io.on("connection", (socket) => {
 });
 
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log("listening at PORT : " + PORT);
 });

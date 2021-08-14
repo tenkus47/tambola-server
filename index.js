@@ -348,7 +348,7 @@ io.on("connection", (socket) => {
       for (var i = 0; i < 91; i++) {
         var item = generatedRandom[i];
         list.push(item);
-        await sleep(1000);
+        await sleep(3000);
         if (i < 90) {
           socket.emit("number", item, list);
           socket.broadcast.emit("number", item, list);

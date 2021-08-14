@@ -35,7 +35,7 @@ app.use("/GenerateTicket", TicketGenerate);
 app.use(
   cors({
     origin: "*",
-    methods: "GET,POST,DELETE",
+    methods: "GET,POST,DELETE,PATCH,PUT",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true,
     preflightContinue: true,
@@ -45,8 +45,9 @@ app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.get("/system/reboot", (req, res)=> {
+app.get("/system/reboot",cors(), (req, res)=> {
 	process.exit(1)
+  res.send('ok')
 })
 
 app.get("/", (req, res) => {

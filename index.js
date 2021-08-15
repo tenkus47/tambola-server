@@ -45,16 +45,19 @@ app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+//rebooting system
+
 app.get("/system/reboot",cors(), (req, res)=> {
 	process.exit(1)
   res.send('ok')
 })
 
+
 app.get("/", (req, res) => {
   res.send("this is backend");
 });
 
-app.post("/createProfile", async (req, res) => {
+app.post("/createProfile",cors(), async (req, res) => {
   var number = (await TambolaModel.find().countDocuments()) + 1;
   const l = await TambolaModel.find({ id: number });
   if (l[0]?.id === number) {

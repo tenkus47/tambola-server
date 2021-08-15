@@ -2,6 +2,7 @@ const tambola=require('tambola');
 const route=require('express').Router();
 const cors =require('cors')
 
+
 route.get('/',cors(),(req,res)=>{
 
     const TicketGenerator=()=>{
@@ -10,6 +11,7 @@ route.get('/',cors(),(req,res)=>{
        }
        res.json(TicketGenerator())
 })
+
 
 
 module.exports= route

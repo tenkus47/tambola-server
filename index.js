@@ -3,7 +3,6 @@ const { PORT} = require("./config");
 const app = express();
 const http=require('http')
 var bodyParser = require("body-parser");
-const TicketGenerate = require("./Route/TicketGenerate");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const TambolaModel = require("./models/uploadData");
@@ -31,7 +30,6 @@ con.on("open", () => {
   console.log("database connected");
 });
 
-app.use("/GenerateTicket", TicketGenerate);
 app.use(
   cors({
     origin: "*",
@@ -68,8 +66,10 @@ app.post("/createProfile",cors(), async (req, res) => {
     username: req.body.userName,
     ticket: req.body.Ticket,
     gpay: req.body.Gpay,
+    TicketNo:req.body.TicketNo
   });
   try {
+    console.log(req.body.TicketNo)
     Userlist.save();
   } catch (e) {
     console.log("error");
@@ -337,6 +337,7 @@ let pricesetter=(price)=>{
   return {fullhouseP,firstlineP,thirdlineP,secondlineP,quick5P,fourcornerP,temperatureP}
 }
 console.log(process.pid)
+
 io.on("connection", (socket) => {
 
   var list = [];

@@ -9,6 +9,10 @@ const TambolaSchema= new mongoose.Schema({
     }, 
     ticket:[[]],
     gpay:Number,
+    TicketNo:{
+        type:Number,
+        default:1
+    }
 })
 
 const model=mongoose.model('Tambola',TambolaSchema)

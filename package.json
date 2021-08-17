@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "forever --minUptime 5000 --spinSleepTime 3000 index.js"
-    
+    "start": "forever --minUptime 5000 --spinSleepTime 3000 index.js",
+    "devstart": "nodemon index.js"
   },
   "author": "",
   "license": "ISC",
@@ -18,6 +18,9 @@
     "express": "^4.17.1",
     "forever": "^4.0.1",
     "mongoose": "^5.13.6",
+    "mongoose-auto-increment": "^5.0.1",
+    "mongoose-auto-increment-reworked": "^1.2.1",
+    "mongoose-sequence": "^5.3.1",
     "socket.io": "^4.1.3",
     "tambola": "^3.0.3",
     "tambola-generator": "^1.0.0",

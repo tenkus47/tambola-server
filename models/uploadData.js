@@ -1,7 +1,6 @@
 const mongoose =require('mongoose')
 
 
-
 const TambolaSchema= new mongoose.Schema({
     id:Number,
     username:{
@@ -9,13 +8,9 @@ const TambolaSchema= new mongoose.Schema({
     }, 
     ticket:[[]],
     gpay:Number,
-    TicketNo:{
-        type:Number,
-        default:1
-    }
+    userId:String
 })
 
-const model=mongoose.model('Tambola',TambolaSchema)
 
 
-module.exports=model
+module.exports=TambolaSchema

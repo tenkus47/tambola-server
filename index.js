@@ -5,7 +5,9 @@ const http=require('http')
 var bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const TambolaModel = require("./models/uploadData");
+const {MongooseAutoIncrementID} =require('mongoose-auto-increment-reworked');
+const TambolaSchema= require("./models/uploadData");
+
 const ListModel = require("./models/ticketList");
 const WinnerModel=require('./models/winnerlist')
 var tambola = require("tambola");
@@ -25,6 +27,19 @@ mongoose.connect(process.env.MONGOURL, {
   useCreateIndex: true,
 });
 const con = mongoose.connection;
+MongooseAutoIncrementID.initialise('MyCustomName'); 
+const plugin = new MongooseAutoIncrementID(TambolaSchema, 'MyTambola',{field:'id'});
+plugin.applyPlugin()
+  .then(() => {
+    // Plugin ready to use! You don't need to wait for this promise - any save queries will just get queued.
+    // Every document will have an auto-incremented number value on _id.
+  })
+  .catch(e => {
+    // Plugin failed to initialise
+  });
+ TambolaSchema.plugin(MongooseAutoIncrementID.plugin, {modelName: 'MyTambola'});
+const TambolaModel=mongoose.model('Playerdata',TambolaSchema)
+
 
 con.on("open", () => {
   console.log("database connected");
@@ -56,20 +71,14 @@ app.get("/", (req, res) => {
 });
 
 app.post("/createProfile",cors(), async (req, res) => {
-  var number = (await TambolaModel.find().countDocuments()) + 1;
-  const l = await TambolaModel.find({ id: number });
-  if (l[0]?.id === number) {
-    number = Math.floor(Math.random() * 900);
-  }
+
   const Userlist = new TambolaModel({
-    id: number,
     username: req.body.userName,
     ticket: req.body.Ticket,
     gpay: req.body.Gpay,
-    TicketNo:req.body.TicketNo
+    userId:req.body.userId
   });
   try {
-    console.log(req.body.TicketNo)
     Userlist.save();
   } catch (e) {
     console.log("error");
@@ -89,7 +98,7 @@ app.delete("/removeTicket", async (req, res) => {
 
 app.get("/getList/:id", async (req, res) => {
   const id = req.params.id;
-  const data = await TambolaModel.find({ id });
+  const data = await TambolaModel.find({ userId:id });
   res.json(data);
 });
 var timeout = null;
@@ -103,7 +112,7 @@ var countfirst=[];
 var countsecond=[];
 var countthird=[];
 var countfull=[];
-
+process.setMaxListeners(0);
 var q5winner = [];
 var tempwinner = [];
 var fourcornerWinner=[];
@@ -124,7 +133,7 @@ const quickfiveCheck = (data, anouncedlist) => {
         count.push(unique[r]);
       }
       if (count.length === 5) {
-        winnerlist.push([data[i].username,data[i].id]);
+        winnerlist.push([data[i].username,data[i].userId]);
         break;
       }
     }
@@ -146,7 +155,7 @@ const tempwinnercheck = (data, anouncedlist) => {
       if (anouncedlist.includes(sorted[1]) && anouncedlist.includes(sorted[15])) {
         countTemp.push(sorted[1]);
         countTemp.push(sorted[15]);
-        winnerlist.push([data[i].username,data[i].id]);
+        winnerlist.push([data[i].username,data[i].userId]);
       }
       if (countTemp.length === 2) {
         break;
@@ -155,7 +164,7 @@ const tempwinnercheck = (data, anouncedlist) => {
   }
   tempwinner=[...winnerlist];
 };
-const foutcornerwinnercheck=(data,anouncedlist)=>{
+const fourcornerwinnercheck=(data,anouncedlist)=>{
   var winnerlist = [];
 
   for (var i = 0; i < data.length; i++) {
@@ -182,7 +191,7 @@ const foutcornerwinnercheck=(data,anouncedlist)=>{
       }
       
       if (countfourcorner.length === 4) {
-        winnerlist.push([data[i].username,data[i].id]);
+        winnerlist.push([data[i].username,data[i].userId]);
         break;
       }
   }
@@ -207,7 +216,7 @@ const firstlinewinnercheck = (data, anouncedlist) => {
         countfirst.push(unique[r])
       }
       if (countfirst.length === 5) {
-        winnerlist.push([data[i].username,data[i].id]);
+        winnerlist.push([data[i].username,data[i].userId]);
         break;
       }
     }
@@ -233,7 +242,7 @@ const secondlinewinnercheck = (data, anouncedlist) => {
         countsecond.push(unique[r])
       }
       if (countsecond.length === 5) {
-        winnerlist.push([data[i].username,data[i].id]);
+        winnerlist.push([data[i].username,data[i].userId]);
         break;
       }
     }
@@ -259,7 +268,7 @@ const thirdlinewinnercheck = (data, anouncedlist) => {
         countthird.push(unique[r])
       }
       if (countthird.length === 5) {
-        winnerlist.push([data[i].username,data[i].id]);
+        winnerlist.push([data[i].username,data[i].userId]);
         break;
       }
     }
@@ -285,7 +294,7 @@ const fullhouseWinnercheck=(data,anouncedlist)=>{
         countfull.push(unique[r])
       }
       if (countfull.length === 15) {
-        winnerlist.push([data[i].username,data[i].id]);
+        winnerlist.push([data[i].username,data[i].userId]);
         break;
       }
     }
@@ -296,48 +305,39 @@ let winnercheck = async (list) => {
   const data = await TambolaModel.find();
   const anouncedlist = list;
   if (q5winner.length===0) {
-    quickfiveCheck(data, anouncedlist);
+   await quickfiveCheck(data, anouncedlist);
   }
   if (tempwinner.length===0) {
-    tempwinnercheck(data, anouncedlist);
+    await tempwinnercheck(data, anouncedlist);
   }
   if (fourcornerWinner.length===0){
-    foutcornerwinnercheck(data,anouncedlist);
+   await fourcornerwinnercheck(data,anouncedlist);
   }
   if (firstlineWinner.length===0){
-    firstlinewinnercheck(data,anouncedlist);
-    fullhouseWinnercheck(data,anouncedlist);
+   await firstlinewinnercheck(data,anouncedlist);
+   await fullhouseWinnercheck(data,anouncedlist);
 
   }
   if (secondlineWinner.length===0){
-    secondlinewinnercheck(data,anouncedlist);
-    fullhouseWinnercheck(data,anouncedlist);
+   await secondlinewinnercheck(data,anouncedlist);
+   await fullhouseWinnercheck(data,anouncedlist);
 
   }
   if (thirdlineWinner.length===0){
-    thirdlinewinnercheck(data,anouncedlist);
-    fullhouseWinnercheck(data,anouncedlist);
+  await  thirdlinewinnercheck(data,anouncedlist);
+   await fullhouseWinnercheck(data,anouncedlist);
 
   }
   if(firstlineWinner.length!=0 && secondlineWinner.length!==0 && thirdlineWinner.length!=0&&fullhouseWinner.length===0){
-    fullhouseWinnercheck(data,anouncedlist);
+   await fullhouseWinnercheck(data,anouncedlist);
   }
 
 return {q5winner,tempwinner,fourcornerWinner,firstlineWinner,secondlineWinner,thirdlineWinner,fullhouseWinner}
 };
-let pricesetter=(price)=>{
-  var deduct=price-(price*0.10)
- var fullhouseP=Math.floor(deduct*0.25);
- var firstlineP=Math.floor(deduct*0.15);
- var thirdlineP=Math.floor(deduct*0.15);
- var secondlineP=Math.floor(deduct*0.15);
- var quick5P=Math.floor(deduct*0.10);
- var fourcornerP=Math.floor(deduct*0.10);
- var temperatureP=Math.floor(deduct*0.05);
-  return {fullhouseP,firstlineP,thirdlineP,secondlineP,quick5P,fourcornerP,temperatureP}
-}
+
 console.log(process.pid)
 
+var generatedRandom = tambola.getDrawSequence();
 io.on("connection", (socket) => {
 
   var list = [];
@@ -348,7 +348,6 @@ io.on("connection", (socket) => {
       await sleepstop();
     }
     if (data === true) {
-      var generatedRandom = tambola.getDrawSequence();
       for (var i = 0; i < 91; i++) {
         var item = generatedRandom[i];
         list.push(item);
@@ -374,11 +373,9 @@ io.on("connection", (socket) => {
               { list, random: item }
             );
           }
-        const winner=  await winnercheck(list);
-         const priceDistribution =pricesetter(price)
+        const winner= await winnercheck(list);
 
           socket.broadcast.emit('winnerlist',winner)
-          socket.broadcast.emit('price',priceDistribution)
         
           
         } else {
@@ -424,3 +421,5 @@ io.on("connection", (socket) => {
 server.listen(PORT, () => {
   console.log("listening at PORT : " + PORT);
 });
+
+

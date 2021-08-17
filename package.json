@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "forever start --minUptime 1000 --spinSleepTime 1000  index.js"
+    "start": "forever --minUptime 5000 --spinSleepTime 3000 index.js"
     
   },
   "author": "",

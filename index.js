@@ -91,9 +91,17 @@ app.get("/getList", async (req, res) => {
   res.json(data);
 });
 
+app.get("/getwinnerlist", async (req, res) => {
+  const data = await WinnerModel.find();
+  res.json(data);
+});
+
 app.delete("/removeTicket", async (req, res) => {
   const { id } = req.query;
   const data = await TambolaModel.findByIdAndDelete(id);
+});
+app.get("/reset", async (req, res) => {
+  await con.collection('winnerlists').drop()
 });
 
 app.get("/getList/:id", async (req, res) => {
@@ -351,7 +359,7 @@ io.on("connection", (socket) => {
       for (var i = 0; i < 91; i++) {
         var item = generatedRandom[i];
         list.push(item);
-        await sleep(3000);
+        await sleep(5000);
         if (i < 90) {
           socket.emit("number", item, list);
           socket.broadcast.emit("number", item, list);

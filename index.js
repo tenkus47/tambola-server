@@ -21,6 +21,24 @@ const io = require("socket.io")(server, {
   },
 });
 
+var timeout = null;
+let sleep = (ms) =>
+  new Promise((resolve) => (timeout = setTimeout(resolve, ms)));
+let sleepstop = () => new Promise((resolve) => clearTimeout(timeout));
+
+
+process.setMaxListeners(0);
+var q5winner = [];
+var tempwinner = [];
+var fourcornerWinner=[];
+var firstlineWinner = [];
+var secondlineWinner = [];
+var thirdlineWinner = [];
+var fullhouseWinner = [];
+
+
+
+
 mongoose.connect(process.env.MONGOURL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -125,7 +143,7 @@ app.delete("/removeTicket", async (req, res) => {
 app.patch("/changeusername",async (req,res)=>{
    const {option,username} =req.body
 console.log(option,username)
-  const data=await TambolaModel.findByIdAndUpdate(option,{username})
+  const data=await TambolaModel.updateMany({id:option},{username:username})
 })
 
 app.get("/reset", async (req, res) => {
@@ -139,36 +157,22 @@ app.get("/playerremove", async (req, res) => {
 
 app.get("/getList/:id", async (req, res) => {
   const id = req.params.id;
-  const data = await TambolaModel.find({ _id:id });
+  const data = await TambolaModel.find({ id:id });
   res.json(data);
 });
-var timeout = null;
-let sleep = (ms) =>
-  new Promise((resolve) => (timeout = setTimeout(resolve, ms)));
-let sleepstop = () => new Promise((resolve) => clearTimeout(timeout));
-var count = [];
-var countTemp = [];
-var countfourcorner=[];
-var countfirst=[];
-var countsecond=[];
-var countthird=[];
-var countfull=[];
-process.setMaxListeners(0);
-var q5winner = [];
-var tempwinner = [];
-var fourcornerWinner=[];
-var firstlineWinner = [];
-var secondlineWinner = [];
-var thirdlineWinner = [];
-var fullhouseWinner = [];
+
+
+
+
 const quickfiveCheck = (data, anouncedlist) => {
-  var breaks = false;
+
   var winnerlist = [];
   for (var i = 0; i < data.length; i++) {
    
-    count = [];
-    const flat = data[i].ticket.flat(1);
-    let unique = [...new Set(flat)];
+   var count = [];
+    const flat = data[i].ticket.flat();
+    let ar = [...new Set(flat)];
+    let unique=ar.filter(item=>item!==0)
     for (var r = 0; r < unique.length; r++) {
       if (anouncedlist.includes(unique[r])) {
         count.push(unique[r]);
@@ -178,38 +182,16 @@ const quickfiveCheck = (data, anouncedlist) => {
         break;
       }
     }
+   
   }
   q5winner = [...winnerlist];
 
-};
-const tempwinnercheck = (data, anouncedlist) => {
-
-  var winnerlist = [];
-
-
-  for (var i = 0; i < data.length; i++) {
-    countTemp=[]
-    const flat = data[i].ticket.flat(1);
-    let unique = [...new Set(flat)];
-    const sorted = unique.sort((a, b) => a - b);
-    for (var r = 0; r < sorted.length; r++) {
-      if (anouncedlist.includes(sorted[1]) && anouncedlist.includes(sorted[15])) {
-        countTemp.push(sorted[1]);
-        countTemp.push(sorted[15]);
-        winnerlist.push([data[i].username,data[i].id]);
-      }
-      if (countTemp.length === 2) {
-        break;
-      }
-    }
-  }
-  tempwinner=[...winnerlist];
 };
 const fourcornerwinnercheck=(data,anouncedlist)=>{
   var winnerlist = [];
 
   for (var i = 0; i < data.length; i++) {
-    countfourcorner = [];
+   var  countfourcorner = [];
     const flat = data[i].ticket.flat(1);
     let unique = [...new Set(flat)];
     let index = unique.indexOf(0);
@@ -244,7 +226,7 @@ const firstlinewinnercheck = (data, anouncedlist) => {
   var winnerlist = [];
 
   for (var i = 0; i < data.length; i++) {
-    countfirst = [];
+   var countfirst = [];
     const flat = data[i].ticket.flat(1);
     let unique = [...new Set(flat)];
     let index = unique.indexOf(0);
@@ -270,7 +252,7 @@ const secondlinewinnercheck = (data, anouncedlist) => {
   var winnerlist = [];
 
   for (var i = 0; i < data.length; i++) {
-    countsecond = [];
+   var  countsecond = [];
     const flat = data[i].ticket.flat(1);
     let unique = [...new Set(flat)];
     let index = unique.indexOf(0);
@@ -296,7 +278,7 @@ const thirdlinewinnercheck = (data, anouncedlist) => {
   var winnerlist = [];
 
   for (var i = 0; i < data.length; i++) {
-    countthird = [];
+    var countthird = [];
     const flat = data[i].ticket.flat(1);
     let unique = [...new Set(flat)];
     let index = unique.indexOf(0);
@@ -322,7 +304,7 @@ const fullhouseWinnercheck=(data,anouncedlist)=>{
   var winnerlist = [];
 
   for (var i = 0; i < data.length; i++) {
-    countfull = [];
+    var countfull = [];
     const flat = data[i].ticket.flat(1);
     let unique = [...new Set(flat)];
     let index = unique.indexOf(0);
@@ -344,80 +326,60 @@ const fullhouseWinnercheck=(data,anouncedlist)=>{
   }
  fullhouseWinner = [...winnerlist];
 }
-let winnercheck = async (list) => {
-  const data = await TambolaModel.find();
-  const anouncedlist = list;
 
+
+
+let winnercheck = (data,list) => {
   if (q5winner.length===0) {
-
-    await quickfiveCheck(data, anouncedlist);
-    
+  quickfiveCheck(data,list);
   }
-
-  if (tempwinner.length===0) {
-   
-    await tempwinnercheck(data, anouncedlist);
-    
-  }
-
   if (fourcornerWinner.length===0){
-
-    await fourcornerwinnercheck(data,anouncedlist);
-    
+     fourcornerwinnercheck(data,list);
   }
 
   if (firstlineWinner.length===0){
-
-    await firstlinewinnercheck(data,anouncedlist);
-   await fullhouseWinnercheck(data,anouncedlist);
-
+     firstlinewinnercheck(data,list);
+    fullhouseWinnercheck(data,list);
   }
 
   if (secondlineWinner.length===0){
-
-
-    await secondlinewinnercheck(data,anouncedlist);
-   await fullhouseWinnercheck(data,anouncedlist);
+    secondlinewinnercheck(data,list);
+    fullhouseWinnercheck(data,list);
 
   }
 
   if (thirdlineWinner.length===0){
-
-    await  thirdlinewinnercheck(data,anouncedlist);
-   await fullhouseWinnercheck(data,anouncedlist);
+      thirdlinewinnercheck(data,list);
+   fullhouseWinnercheck(data,list);
 
   }
 
   if(firstlineWinner.length!=0 && secondlineWinner.length!==0 && thirdlineWinner.length!=0&&fullhouseWinner.length===0){
 
 
-    await fullhouseWinnercheck(data,anouncedlist);
+     fullhouseWinnercheck(data,list);
 
   }
 
 return {q5winner,tempwinner,fourcornerWinner,firstlineWinner,secondlineWinner,thirdlineWinner,fullhouseWinner}
 };
 
-io.on("connection", (socket) => {
+io.on("connection",async (socket) => {
 
   var list = [];
-
+   var datas = await TambolaModel.find();
+  var generatedRandom = tambola.getDrawSequence();
   socket.on("starts", async (data) => {
-
-
-    var generatedRandom = tambola.getDrawSequence();
     if (data === false) {
       await sleepstop();
     }
     if (data === true) {
       for (var i = 0; i < 91; i++) {
+        
+        await sleep(3000);
         var item = generatedRandom[i];
         list.push(item);
         if (i < 90) {
-
-          await sleep(5000);
-          const winner= await winnercheck(list);
-
           socket.emit("number", item, list);
           socket.broadcast.emit("number", item, list);
           if (i === 0) {
@@ -438,6 +400,11 @@ io.on("connection", (socket) => {
               { list, random: item }
             );
           }
+          
+         
+          const winner=winnercheck(datas,list);
+         
+
           socket.broadcast.emit('winnerlist',winner)
         
           

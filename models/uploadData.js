@@ -3,12 +3,12 @@ const mongoose =require('mongoose')
 
 const TambolaSchema= new mongoose.Schema({
     id:Number,
+    ticket:[[]],
     username:{
         type:String,
-    }, 
-    ticket:[[]],
-    gpay:Number,
-    userId:String
+        default:'Available'
+    },
+    color:String
 })
 
 

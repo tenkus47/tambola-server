@@ -9,7 +9,8 @@ const {MongooseAutoIncrementID} =require('mongoose-auto-increment-reworked');
 const TambolaSchema= require("./models/uploadData");
 
 const ListModel = require("./models/ticketList");
-const WinnerModel=require('./models/winnerlist')
+const WinnerModel=require('./models/winnerlist');
+const TimingModel=require('./models/GameTiming');
 var tambola = require("tambola");
 
 const server=http.createServer(app)
@@ -31,19 +32,14 @@ MongooseAutoIncrementID.initialise('MyCustomName');
 const plugin = new MongooseAutoIncrementID(TambolaSchema, 'MyTambola',{field:'id'});
 plugin.applyPlugin()
   .then(() => {
-    // Plugin ready to use! You don't need to wait for this promise - any save queries will just get queued.
-    // Every document will have an auto-incremented number value on _id.
   })
   .catch(e => {
-    // Plugin failed to initialise
   });
  TambolaSchema.plugin(MongooseAutoIncrementID.plugin, {modelName: 'MyTambola'});
 const TambolaModel=mongoose.model('Playerdata',TambolaSchema)
 
 
 con.on("open", () => {
-  console.log("database connected");
-});
 
 app.use(
   cors({
@@ -65,21 +61,46 @@ app.get("/system/reboot",cors(), (req, res)=> {
   res.send('ok')
 })
 
+app.get('/anounced',async(req,res)=>{
+  var data=await ListModel.find();
+  res.json(data);
+})
 
 app.get("/", (req, res) => {
   res.send("this is backend");
 });
+app.get('/Timings',async(req,res)=>{
+const data=await TimingModel.find();
+res.json(data)
+})
+
+app.post('/Timings', async (req,res)=>{
+  await con.collection('timings').drop()
+
+const StartingTime=req.body.time
+
+const createTime=new TimingModel({
+  startTime:StartingTime
+})
+
+try {
+  createTime.save();
+} catch (e) {
+  console.log("error");
+  res.send(e);
+}
+
+})
+
 
 app.post("/createProfile",cors(), async (req, res) => {
 
   const Userlist = new TambolaModel({
-    username: req.body.userName,
     ticket: req.body.Ticket,
-    gpay: req.body.Gpay,
-    userId:req.body.userId
+    color:  req.body.color
   });
   try {
-    Userlist.save();
+   var r= Userlist.save();
   } catch (e) {
     console.log("error");
     res.send(e);
@@ -98,15 +119,27 @@ app.get("/getwinnerlist", async (req, res) => {
 
 app.delete("/removeTicket", async (req, res) => {
   const { id } = req.query;
-  const data = await TambolaModel.findByIdAndDelete(id);
+   await TambolaModel.findByIdAndDelete(id);
 });
+
+app.patch("/changeusername",async (req,res)=>{
+   const {option,username} =req.body
+console.log(option,username)
+  const data=await TambolaModel.findByIdAndUpdate(option,{username})
+})
+
 app.get("/reset", async (req, res) => {
   await con.collection('winnerlists').drop()
+});
+app.get("/playerremove", async (req, res) => {
+  await con.collection('playerdatas').drop()
+  await con.collection('mycustomnames').drop()
+
 });
 
 app.get("/getList/:id", async (req, res) => {
   const id = req.params.id;
-  const data = await TambolaModel.find({ userId:id });
+  const data = await TambolaModel.find({ _id:id });
   res.json(data);
 });
 var timeout = null;
@@ -141,7 +174,7 @@ const quickfiveCheck = (data, anouncedlist) => {
         count.push(unique[r]);
       }
       if (count.length === 5) {
-        winnerlist.push([data[i].username,data[i].userId]);
+        winnerlist.push([data[i].username,data[i].id]);
         break;
       }
     }
@@ -163,7 +196,7 @@ const tempwinnercheck = (data, anouncedlist) => {
       if (anouncedlist.includes(sorted[1]) && anouncedlist.includes(sorted[15])) {
         countTemp.push(sorted[1]);
         countTemp.push(sorted[15]);
-        winnerlist.push([data[i].username,data[i].userId]);
+        winnerlist.push([data[i].username,data[i].id]);
       }
       if (countTemp.length === 2) {
         break;
@@ -190,16 +223,18 @@ const fourcornerwinnercheck=(data,anouncedlist)=>{
       if ( anouncedlist.includes(unique[10])) 
       {
       countfourcorner.push(unique[10])
-      }if ( anouncedlist.includes(unique[4])) 
+      }
+      if ( anouncedlist.includes(unique[4])) 
       {
       countfourcorner.push(unique[4])
-      }if ( anouncedlist.includes(unique[14])) 
+      }
+      if ( anouncedlist.includes(unique[14])) 
       {
       countfourcorner.push(unique[14])
       }
       
       if (countfourcorner.length === 4) {
-        winnerlist.push([data[i].username,data[i].userId]);
+        winnerlist.push([data[i].username,data[i].id]);
         break;
       }
   }
@@ -224,7 +259,7 @@ const firstlinewinnercheck = (data, anouncedlist) => {
         countfirst.push(unique[r])
       }
       if (countfirst.length === 5) {
-        winnerlist.push([data[i].username,data[i].userId]);
+        winnerlist.push([data[i].username,data[i].id]);
         break;
       }
     }
@@ -250,7 +285,7 @@ const secondlinewinnercheck = (data, anouncedlist) => {
         countsecond.push(unique[r])
       }
       if (countsecond.length === 5) {
-        winnerlist.push([data[i].username,data[i].userId]);
+        winnerlist.push([data[i].username,data[i].id]);
         break;
       }
     }
@@ -276,7 +311,7 @@ const thirdlinewinnercheck = (data, anouncedlist) => {
         countthird.push(unique[r])
       }
       if (countthird.length === 5) {
-        winnerlist.push([data[i].username,data[i].userId]);
+        winnerlist.push([data[i].username,data[i].id]);
         break;
       }
     }
@@ -302,7 +337,7 @@ const fullhouseWinnercheck=(data,anouncedlist)=>{
         countfull.push(unique[r])
       }
       if (countfull.length === 15) {
-        winnerlist.push([data[i].username,data[i].userId]);
+        winnerlist.push([data[i].username,data[i].id]);
         break;
       }
     }
@@ -312,46 +347,65 @@ const fullhouseWinnercheck=(data,anouncedlist)=>{
 let winnercheck = async (list) => {
   const data = await TambolaModel.find();
   const anouncedlist = list;
+
   if (q5winner.length===0) {
-   await quickfiveCheck(data, anouncedlist);
+
+    await quickfiveCheck(data, anouncedlist);
+    
   }
+
   if (tempwinner.length===0) {
+   
     await tempwinnercheck(data, anouncedlist);
+    
   }
+
   if (fourcornerWinner.length===0){
-   await fourcornerwinnercheck(data,anouncedlist);
+
+    await fourcornerwinnercheck(data,anouncedlist);
+    
   }
+
   if (firstlineWinner.length===0){
-   await firstlinewinnercheck(data,anouncedlist);
+
+    await firstlinewinnercheck(data,anouncedlist);
    await fullhouseWinnercheck(data,anouncedlist);
 
   }
+
   if (secondlineWinner.length===0){
-   await secondlinewinnercheck(data,anouncedlist);
+
+
+    await secondlinewinnercheck(data,anouncedlist);
    await fullhouseWinnercheck(data,anouncedlist);
 
   }
+
   if (thirdlineWinner.length===0){
-  await  thirdlinewinnercheck(data,anouncedlist);
+
+    await  thirdlinewinnercheck(data,anouncedlist);
    await fullhouseWinnercheck(data,anouncedlist);
 
   }
+
   if(firstlineWinner.length!=0 && secondlineWinner.length!==0 && thirdlineWinner.length!=0&&fullhouseWinner.length===0){
-   await fullhouseWinnercheck(data,anouncedlist);
+
+
+    await fullhouseWinnercheck(data,anouncedlist);
+
   }
 
 return {q5winner,tempwinner,fourcornerWinner,firstlineWinner,secondlineWinner,thirdlineWinner,fullhouseWinner}
 };
 
-console.log(process.pid)
-
-var generatedRandom = tambola.getDrawSequence();
 io.on("connection", (socket) => {
 
   var list = [];
 
-  socket.on("starts", async (data,price) => {
+  socket.on("starts", async (data) => {
 
+
+    var generatedRandom = tambola.getDrawSequence();
     if (data === false) {
       await sleepstop();
     }
@@ -359,8 +413,11 @@ io.on("connection", (socket) => {
       for (var i = 0; i < 91; i++) {
         var item = generatedRandom[i];
         list.push(item);
-        await sleep(5000);
         if (i < 90) {
+
+          await sleep(5000);
+          const winner= await winnercheck(list);
+
           socket.emit("number", item, list);
           socket.broadcast.emit("number", item, list);
           if (i === 0) {
@@ -381,8 +438,6 @@ io.on("connection", (socket) => {
               { list, random: item }
             );
           }
-        const winner= await winnercheck(list);
-
           socket.broadcast.emit('winnerlist',winner)
         
           
@@ -425,6 +480,12 @@ io.on("connection", (socket) => {
   
 });
 
+
+console.log('connected')});
+
+con.on('disconnect',()=>{
+  console.log('disconnected')
+})
 
 server.listen(PORT, () => {
   console.log("listening at PORT : " + PORT);

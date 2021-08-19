@@ -376,7 +376,7 @@ io.on("connection",async (socket) => {
     if (data === true) {
       for (var i = 0; i < 91; i++) {
         
-        await sleep(3000);
+        await sleep(6000);
         var item = generatedRandom[i];
         list.push(item);
         if (i < 90) {

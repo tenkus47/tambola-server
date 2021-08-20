@@ -12,6 +12,7 @@ const ListModel = require("./models/ticketList");
 const WinnerModel=require('./models/winnerlist');
 const TimingModel=require('./models/GameTiming');
 var tambola = require("tambola");
+const { default: Tambola } = require("tambola-generator");
 
 const server=http.createServer(app)
 
@@ -170,9 +171,15 @@ app.delete("/removeTicket", async (req, res) => {
 });
 
 app.patch("/changeusername",async (req,res)=>{
-   const {id,username} =req.body
+   const {id,username,agentName} =req.body
+
+
 for(var j=0;j<id.length;j++){
-  const data=await TambolaModel.updateMany({id:id[j]},{username:username})
+
+  var list=await TambolaModel.find({id:id[j]})
+  if(list.agentName==='undefined'||list.agentName===agentName){
+    const data=await TambolaModel.updateMany({id:id[j]},{username:username,agentName:agentName})
+  }
 }
 
 

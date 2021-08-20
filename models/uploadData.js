@@ -8,7 +8,11 @@ const TambolaSchema= new mongoose.Schema({
         type:String,
         default:'Available'
     },
-    color:String
+    color:String,
+    agentName:{
+        type:String,
+        default:'no'
+    }
 })
 
 

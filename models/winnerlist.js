@@ -14,6 +14,7 @@ const TambolaSchema= new mongoose.Schema({
     secondlineWinner:[],
     thirdlineWinner:[],
     fullhouseWinner:[],
+    secondfullhouseWinner:[]
 })
 
 const model=mongoose.model('winnerlist',TambolaSchema)

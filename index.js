@@ -7,7 +7,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const {MongooseAutoIncrementID} =require('mongoose-auto-increment-reworked');
 const TambolaSchema= require("./models/uploadData");
-
+const PrivateKey=require("./models/Password");
 const ListModel = require("./models/ticketList");
 const WinnerModel=require('./models/winnerlist');
 const TimingModel=require('./models/GameTiming');
@@ -35,6 +35,7 @@ var firstlineWinner = [];
 var secondlineWinner = [];
 var thirdlineWinner = [];
 var fullhouseWinner = [];
+var secondfullhouseWinner=[];
 
 
 
@@ -78,6 +79,27 @@ app.get("/system/reboot",cors(), (req, res)=> {
 	process.exit(1)
   res.send('ok')
 })
+app.get('/privatekey',async(req,res)=>{
+  var data=await PrivateKey.find();
+  res.json(data);
+})
+
+app.post('/privatekey',async(req,res)=>{
+  var key=req.body.key;
+  var data=new PrivateKey({
+    key:key
+  })
+
+    
+  try{
+    data.save();
+  }
+  catch(e){
+    console.log('key not saved');
+  }
+})
+
+
 
 app.get('/anounced',async(req,res)=>{
   var data=await ListModel.find();
@@ -113,16 +135,23 @@ try {
 
 app.post("/createProfile",cors(), async (req, res) => {
 
-  const Userlist = new TambolaModel({
-    ticket: req.body.Ticket,
-    color:  req.body.color
-  });
-  try {
-   var r= Userlist.save();
-  } catch (e) {
-    console.log("error");
-    res.send(e);
+  var ticket=req.body.Ticket;
+
+  const flat = ticket.flat(1);
+  let unique = [...new Set(flat)];
+  if(unique.length===16){
+    const Userlist = new TambolaModel({
+      ticket: req.body.Ticket,
+      color:  req.body.color
+    });
+    try {
+     var r= Userlist.save();
+    } catch (e) {
+      console.log("error");
+      res.send(e);
+    }
   }
+  
 });
 
 app.get("/getList", async (req, res) => {
@@ -141,9 +170,13 @@ app.delete("/removeTicket", async (req, res) => {
 });
 
 app.patch("/changeusername",async (req,res)=>{
-   const {option,username} =req.body
-console.log(option,username)
-  const data=await TambolaModel.updateMany({id:option},{username:username})
+   const {id,username} =req.body
+for(var j=0;j<id.length;j++){
+  const data=await TambolaModel.updateMany({id:id[j]},{username:username})
+}
+
+
+
 })
 
 app.get("/reset", async (req, res) => {
@@ -300,7 +333,7 @@ const thirdlinewinnercheck = (data, anouncedlist) => {
   }
   thirdlineWinner = [...winnerlist];
 };
-const fullhouseWinnercheck=(data,anouncedlist)=>{
+const firstFullhousecheck=(data,anouncedlist)=>{
   var winnerlist = [];
 
   for (var i = 0; i < data.length; i++) {
@@ -328,6 +361,32 @@ const fullhouseWinnercheck=(data,anouncedlist)=>{
 }
 
 
+const secondFullhousecheck=(data,anouncedlist)=>{
+  var winnerlist = [];
+  for (var i = 0; i < data.length; i++) {
+    var countfull = [];
+    const flat = data[i].ticket.flat(1);
+    let unique = [...new Set(flat)];
+    let index = unique.indexOf(0);
+    if (index > -1) {
+      unique.splice(index, 1);
+    }
+
+    for (var r = 0; r < 15; r++) {
+      if (
+        anouncedlist.includes(unique[r])
+      ) {
+        countfull.push(unique[r])
+      }
+      if (countfull.length === 15) {
+        winnerlist.push([data[i].username,data[i].id]);
+        break;
+      }
+    }
+  }
+ secondfullhouseWinner = [...winnerlist];
+}
+
 
 let winnercheck = (data,list) => {
   if (q5winner.length===0) {
@@ -339,29 +398,35 @@ let winnercheck = (data,list) => {
 
   if (firstlineWinner.length===0){
      firstlinewinnercheck(data,list);
-    fullhouseWinnercheck(data,list);
+    firstFullhousecheck(data,list);
   }
 
   if (secondlineWinner.length===0){
     secondlinewinnercheck(data,list);
-    fullhouseWinnercheck(data,list);
+    firstFullhousecheck(data,list);
 
   }
 
   if (thirdlineWinner.length===0){
       thirdlinewinnercheck(data,list);
-   fullhouseWinnercheck(data,list);
+   firstFullhousecheck(data,list);
 
   }
 
-  if(firstlineWinner.length!=0 && secondlineWinner.length!==0 && thirdlineWinner.length!=0&&fullhouseWinner.length===0){
-
-
-     fullhouseWinnercheck(data,list);
-
+  if(firstlineWinner.length!=0 && secondlineWinner.length!==0 && thirdlineWinner.length!==0&&fullhouseWinner.length===0){
+     firstFullhousecheck(data,list);
   }
 
-return {q5winner,tempwinner,fourcornerWinner,firstlineWinner,secondlineWinner,thirdlineWinner,fullhouseWinner}
+  if(firstlineWinner.length!=0 && secondlineWinner.length!==0 && thirdlineWinner.length!==0 && fullhouseWinner.length!==0 && secondfullhouseWinner.length===0 ){
+   var newlist=[]
+    for(var i=0;i<firstlineWinner.length;i++){
+    newlist=data.filter(item=>item.id===firstlineWinner[i][1])
+
+  }
+    secondFullhousecheck(newlist,list);
+  }
+
+return {q5winner,tempwinner,fourcornerWinner,firstlineWinner,secondlineWinner,thirdlineWinner,fullhouseWinner,secondfullhouseWinner}
 };
 
 io.on("connection",async (socket) => {
@@ -374,6 +439,8 @@ io.on("connection",async (socket) => {
       await sleepstop();
     }
     if (data === true) {
+  console.log('game started')
+
       for (var i = 0; i < 91; i++) {
         
         await sleep(6000);
@@ -411,7 +478,7 @@ io.on("connection",async (socket) => {
         } else {
           console.log("game done");
         }
-        if(fullhouseWinner.length!==0){
+        if(secondfullhouseWinner.length!==0){
           const winnersave=new WinnerModel({
             quickfiveWinner:q5winner,
             fourcornerWinner:fourcornerWinner,
@@ -419,11 +486,12 @@ io.on("connection",async (socket) => {
             firstlineWinner:firstlineWinner,
             secondlineWinner:secondlineWinner,
             thirdlineWinner:thirdlineWinner,
-            fullhouseWinner:fullhouseWinner
+            fullhouseWinner:fullhouseWinner,
+            secondfullhouseWinner:secondfullhouseWinner
           })
           try {
           winnersave.save();
-          socket.broadcast.emit('gamefinished',fullhouseWinner);
+          socket.broadcast.emit('gamefinished',secondfullhouseWinner);
 
           } catch (e) {
             console.log("error");

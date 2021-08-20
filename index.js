@@ -177,7 +177,7 @@ app.patch("/changeusername",async (req,res)=>{
 for(var j=0;j<id.length;j++){
 
   var list=await TambolaModel.find({id:id[j]})
-  if(list.agentName==='undefined'||list.agentName===agentName){
+  if(list[0].username==='Available'){
     const data=await TambolaModel.updateMany({id:id[j]},{username:username,agentName:agentName})
   }
 }

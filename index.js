@@ -12,8 +12,8 @@ const ListModel = require("./models/ticketList");
 const WinnerModel=require('./models/winnerlist');
 const TimingModel=require('./models/GameTiming');
 var tambola = require("tambola");
-const { default: Tambola } = require("tambola-generator");
 
+var finalnewlist=[]
 const server=http.createServer(app)
 
 const io = require("socket.io")(server, {
@@ -37,7 +37,7 @@ var secondlineWinner = [];
 var thirdlineWinner = [];
 var fullhouseWinner = [];
 var secondfullhouseWinner=[];
-
+var thirdfullhouseWinner=[];
 
 
 
@@ -99,8 +99,6 @@ app.post('/privatekey',async(req,res)=>{
     console.log('key not saved');
   }
 })
-
-
 
 app.get('/anounced',async(req,res)=>{
   var data=await ListModel.find();
@@ -366,8 +364,6 @@ const firstFullhousecheck=(data,anouncedlist)=>{
   }
  fullhouseWinner = [...winnerlist];
 }
-
-
 const secondFullhousecheck=(data,anouncedlist)=>{
   var winnerlist = [];
   for (var i = 0; i < data.length; i++) {
@@ -393,7 +389,31 @@ const secondFullhousecheck=(data,anouncedlist)=>{
   }
  secondfullhouseWinner = [...winnerlist];
 }
+const thirdFullhousecheck=(data,anouncedlist)=>{
+  var winnerlist = [];
+  for (var i = 0; i < data.length; i++) {
+    var countfull = [];
+    const flat = data[i].ticket.flat(1);
+    let unique = [...new Set(flat)];
+    let index = unique.indexOf(0);
+    if (index > -1) {
+      unique.splice(index, 1);
+    }
 
+    for (var r = 0; r < 15; r++) {
+      if (
+        anouncedlist.includes(unique[r])
+      ) {
+        countfull.push(unique[r])
+      }
+      if (countfull.length === 15) {
+        winnerlist.push([data[i].username,data[i].id]);
+        break;
+      }
+    }
+  }
+ thirdfullhouseWinner = [...winnerlist];
+}
 
 let winnercheck = (data,list) => {
   if (q5winner.length===0) {
@@ -424,16 +444,51 @@ let winnercheck = (data,list) => {
      firstFullhousecheck(data,list);
   }
 
+
+
   if(firstlineWinner.length!=0 && secondlineWinner.length!==0 && thirdlineWinner.length!==0 && fullhouseWinner.length!==0 && secondfullhouseWinner.length===0 ){
-   var newlist=[]
-    for(var i=0;i<firstlineWinner.length;i++){
-    newlist=data.filter(item=>item.id===firstlineWinner[i][1])
+var finishedlist=[]
+finalnewlist=data;
 
-  }
-    secondFullhousecheck(newlist,list);
+
+
+fullhouseWinner.map((item)=>{
+      //  finalnewlist = data.filter(s=>s.id!==item[1])
+       finishedlist.push(item[1])
+
+    })
+finishedlist.map(item=>{
+  finalnewlist=finalnewlist.filter(s=>s.id!==item);
+
+})
+
+    secondFullhousecheck(finalnewlist,list);
   }
 
-return {q5winner,tempwinner,fourcornerWinner,firstlineWinner,secondlineWinner,thirdlineWinner,fullhouseWinner,secondfullhouseWinner}
+
+  if(fullhouseWinner.length!==0 && secondfullhouseWinner.length!==0 && thirdfullhouseWinner.length===0 ){
+   console.log('third check')
+    var final=[]
+var finishedlist=[]
+
+    finalnewlist=data;
+    fullhouseWinner.map((item)=>{
+      //  finalnewlist = data.filter(s=>s.id!==item[1])
+       finishedlist.push(item[1])
+    })
+    secondfullhouseWinner.map(item=>{
+      finishedlist.push(item[1])
+    })
+    finishedlist.map(item=>{
+      finalnewlist=finalnewlist.filter(s=>s.id!==item);
+    
+    })
+
+
+     thirdFullhousecheck(finalnewlist,list);
+   }
+
+return {q5winner,tempwinner,fourcornerWinner,firstlineWinner,secondlineWinner,thirdlineWinner,fullhouseWinner,secondfullhouseWinner,thirdfullhouseWinner}
 };
 
 io.on("connection",async (socket) => {
@@ -485,7 +540,7 @@ io.on("connection",async (socket) => {
         } else {
           console.log("game done");
         }
-        if(secondfullhouseWinner.length!==0){
+        if(thirdfullhouseWinner.length!==0){
           const winnersave=new WinnerModel({
             quickfiveWinner:q5winner,
             fourcornerWinner:fourcornerWinner,
@@ -494,11 +549,12 @@ io.on("connection",async (socket) => {
             secondlineWinner:secondlineWinner,
             thirdlineWinner:thirdlineWinner,
             fullhouseWinner:fullhouseWinner,
-            secondfullhouseWinner:secondfullhouseWinner
+            secondfullhouseWinner:secondfullhouseWinner,
+            thirdfullhouseWinner:thirdfullhouseWinner
           })
           try {
           winnersave.save();
-          socket.broadcast.emit('gamefinished',secondfullhouseWinner);
+          socket.broadcast.emit('gamefinished');
 
           } catch (e) {
             console.log("error");

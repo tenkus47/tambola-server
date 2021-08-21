@@ -169,14 +169,16 @@ app.delete("/removeTicket", async (req, res) => {
 });
 
 app.patch("/changeusername",async (req,res)=>{
-   const {id,username,agentName} =req.body
+   const {id,username,agentName,mobile} =req.body
 
 
 for(var j=0;j<id.length;j++){
 
   var list=await TambolaModel.find({id:id[j]})
+console.log(mobile)
   if(list[0].username==='Available'){
-    const data=await TambolaModel.updateMany({id:id[j]},{username:username,agentName:agentName})
+
+    const data=await TambolaModel.updateMany({id:id[j]},{username:username,agentName:agentName,mobile:mobile})
   }
 }
 
@@ -199,6 +201,11 @@ app.get("/getList/:id", async (req, res) => {
   res.json(data);
 });
 
+app.get("/getgroup/:id", async (req, res) => {
+  const id = req.params.id;
+  const data = await TambolaModel.find({ mobile:id });
+  res.json(data);
+});
 
 
 

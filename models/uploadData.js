@@ -12,7 +12,8 @@ const TambolaSchema= new mongoose.Schema({
     agentName:{
         type:String,
         default:'no'
-    }
+    },
+    mobile:Number
 })
 
 

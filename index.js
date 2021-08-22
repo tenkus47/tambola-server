@@ -208,7 +208,6 @@ app.get("/getgroup/:id", async (req, res) => {
 });
 
 
-
 const quickfiveCheck = (data, anouncedlist) => {
 
   var winnerlist = [];
@@ -512,7 +511,7 @@ io.on("connection",async (socket) => {
 
       for (var i = 0; i < 91; i++) {
         
-        await sleep(8000);
+        await sleep(9000);
         var item = generatedRandom[i];
         list.push(item);
         if (i < 90) {

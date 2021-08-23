@@ -619,7 +619,7 @@ wontime=true
             thirdfullhouseWinner:thirdfullhouseWinner
           })
           try {
-          // winnersave.save();
+          winnersave.save();
           socket.broadcast.emit('gamefinished');
 
           } catch (e) {

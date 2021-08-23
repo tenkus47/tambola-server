@@ -208,301 +208,358 @@ app.get("/getgroup/:id", async (req, res) => {
 });
 
 
-const quickfiveCheck = (data, anouncedlist) => {
-
-  var winnerlist = [];
-  for (var i = 0; i < data.length; i++) {
-   
-   var count = [];
-    const flat = data[i].ticket.flat();
-    let ar = [...new Set(flat)];
-    let unique=ar.filter(item=>item!==0)
-    for (var r = 0; r < unique.length; r++) {
-      if (anouncedlist.includes(unique[r])) {
-        count.push(unique[r]);
-      }
-      if (count.length === 5) {
-        winnerlist.push([data[i].username,data[i].id]);
-        break;
-      }
-    }
-   
-  }
-  q5winner = [...winnerlist];
-
-};
-const fourcornerwinnercheck=(data,anouncedlist)=>{
-  var winnerlist = [];
-
-  for (var i = 0; i < data.length; i++) {
-   var  countfourcorner = [];
-    const flat = data[i].ticket.flat(1);
-    let unique = [...new Set(flat)];
-    let index = unique.indexOf(0);
-    if (index > -1) {
-      unique.splice(index, 1);
-    }
-      if ( anouncedlist.includes(unique[0])) 
-      {
-      countfourcorner.push(unique[0])
-      }
-      if ( anouncedlist.includes(unique[10])) 
-      {
-      countfourcorner.push(unique[10])
-      }
-      if ( anouncedlist.includes(unique[4])) 
-      {
-      countfourcorner.push(unique[4])
-      }
-      if ( anouncedlist.includes(unique[14])) 
-      {
-      countfourcorner.push(unique[14])
-      }
-      
-      if (countfourcorner.length === 4) {
-        winnerlist.push([data[i].username,data[i].id]);
-        break;
-      }
-  }
- fourcornerWinner = [...winnerlist];
-}
-const firstlinewinnercheck = (data, anouncedlist) => {
-  var winnerlist = [];
-
-  for (var i = 0; i < data.length; i++) {
-   var countfirst = [];
-    const flat = data[i].ticket.flat(1);
-    let unique = [...new Set(flat)];
-    let index = unique.indexOf(0);
-    if (index > -1) {
-      unique.splice(index, 1);
-    }
-
-    for (var r = 0; r < 5; r++) {
-      if (
-        anouncedlist.includes(unique[r])
-      ) {
-        countfirst.push(unique[r])
-      }
-      if (countfirst.length === 5) {
-        winnerlist.push([data[i].username,data[i].id]);
-        break;
-      }
-    }
-  }
-  firstlineWinner = [...winnerlist];
-};
-const secondlinewinnercheck = (data, anouncedlist) => {
-  var winnerlist = [];
-
-  for (var i = 0; i < data.length; i++) {
-   var  countsecond = [];
-    const flat = data[i].ticket.flat(1);
-    let unique = [...new Set(flat)];
-    let index = unique.indexOf(0);
-    if (index > -1) {
-      unique.splice(index, 1);
-    }
-
-    for (var r = 5; r < 10; r++) {
-      if (
-        anouncedlist.includes(unique[r])
-      ) {
-        countsecond.push(unique[r])
-      }
-      if (countsecond.length === 5) {
-        winnerlist.push([data[i].username,data[i].id]);
-        break;
-      }
-    }
-  }
-  secondlineWinner = [...winnerlist];
-};
-const thirdlinewinnercheck = (data, anouncedlist) => {
-  var winnerlist = [];
-
-  for (var i = 0; i < data.length; i++) {
-    var countthird = [];
-    const flat = data[i].ticket.flat(1);
-    let unique = [...new Set(flat)];
-    let index = unique.indexOf(0);
-    if (index > -1) {
-      unique.splice(index, 1);
-    }
-
-    for (var r = 10; r < 15; r++) {
-      if (
-        anouncedlist.includes(unique[r])
-      ) {
-        countthird.push(unique[r])
-      }
-      if (countthird.length === 5) {
-        winnerlist.push([data[i].username,data[i].id]);
-        break;
-      }
-    }
-  }
-  thirdlineWinner = [...winnerlist];
-};
-const firstFullhousecheck=(data,anouncedlist)=>{
-  var winnerlist = [];
-
-  for (var i = 0; i < data.length; i++) {
-    var countfull = [];
-    const flat = data[i].ticket.flat(1);
-    let unique = [...new Set(flat)];
-    let index = unique.indexOf(0);
-    if (index > -1) {
-      unique.splice(index, 1);
-    }
-
-    for (var r = 0; r < 15; r++) {
-      if (
-        anouncedlist.includes(unique[r])
-      ) {
-        countfull.push(unique[r])
-      }
-      if (countfull.length === 15) {
-        winnerlist.push([data[i].username,data[i].id]);
-        break;
-      }
-    }
-  }
- fullhouseWinner = [...winnerlist];
-}
-const secondFullhousecheck=(data,anouncedlist)=>{
-  var winnerlist = [];
-  for (var i = 0; i < data.length; i++) {
-    var countfull = [];
-    const flat = data[i].ticket.flat(1);
-    let unique = [...new Set(flat)];
-    let index = unique.indexOf(0);
-    if (index > -1) {
-      unique.splice(index, 1);
-    }
-
-    for (var r = 0; r < 15; r++) {
-      if (
-        anouncedlist.includes(unique[r])
-      ) {
-        countfull.push(unique[r])
-      }
-      if (countfull.length === 15) {
-        winnerlist.push([data[i].username,data[i].id]);
-        break;
-      }
-    }
-  }
- secondfullhouseWinner = [...winnerlist];
-}
-const thirdFullhousecheck=(data,anouncedlist)=>{
-  var winnerlist = [];
-  for (var i = 0; i < data.length; i++) {
-    var countfull = [];
-    const flat = data[i].ticket.flat(1);
-    let unique = [...new Set(flat)];
-    let index = unique.indexOf(0);
-    if (index > -1) {
-      unique.splice(index, 1);
-    }
-
-    for (var r = 0; r < 15; r++) {
-      if (
-        anouncedlist.includes(unique[r])
-      ) {
-        countfull.push(unique[r])
-      }
-      if (countfull.length === 15) {
-        winnerlist.push([data[i].username,data[i].id]);
-        break;
-      }
-    }
-  }
- thirdfullhouseWinner = [...winnerlist];
-}
-
-let winnercheck = (data,list) => {
-  if (q5winner.length===0) {
-  quickfiveCheck(data,list);
-  }
-  if (fourcornerWinner.length===0){
-     fourcornerwinnercheck(data,list);
-  }
-
-  if (firstlineWinner.length===0){
-     firstlinewinnercheck(data,list);
-    firstFullhousecheck(data,list);
-  }
-
-  if (secondlineWinner.length===0){
-    secondlinewinnercheck(data,list);
-    firstFullhousecheck(data,list);
-
-  }
-
-  if (thirdlineWinner.length===0){
-      thirdlinewinnercheck(data,list);
-   firstFullhousecheck(data,list);
-
-  }
-
-  if(firstlineWinner.length!=0 && secondlineWinner.length!==0 && thirdlineWinner.length!==0&&fullhouseWinner.length===0){
-     firstFullhousecheck(data,list);
-  }
-
-
-
-  if(firstlineWinner.length!=0 && secondlineWinner.length!==0 && thirdlineWinner.length!==0 && fullhouseWinner.length!==0 && secondfullhouseWinner.length===0 ){
-var finishedlist=[]
-finalnewlist=data;
-
-
-
-fullhouseWinner.map((item)=>{
-      //  finalnewlist = data.filter(s=>s.id!==item[1])
-       finishedlist.push(item[1])
-
-    })
-finishedlist.map(item=>{
-  finalnewlist=finalnewlist.filter(s=>s.id!==item);
-
-})
-
-    secondFullhousecheck(finalnewlist,list);
-  }
-
-
-  if(fullhouseWinner.length!==0 && secondfullhouseWinner.length!==0 && thirdfullhouseWinner.length===0 ){
-   console.log('third check')
-    var final=[]
-var finishedlist=[]
-
-    finalnewlist=data;
-    fullhouseWinner.map((item)=>{
-      //  finalnewlist = data.filter(s=>s.id!==item[1])
-       finishedlist.push(item[1])
-    })
-    secondfullhouseWinner.map(item=>{
-      finishedlist.push(item[1])
-    })
-    finishedlist.map(item=>{
-      finalnewlist=finalnewlist.filter(s=>s.id!==item);
-    
-    })
-
-
-     thirdFullhousecheck(finalnewlist,list);
-   }
-
-return {q5winner,tempwinner,fourcornerWinner,firstlineWinner,secondlineWinner,thirdlineWinner,fullhouseWinner,secondfullhouseWinner,thirdfullhouseWinner}
-};
 
 io.on("connection",async (socket) => {
-
+ var wontime=false;
   var list = [];
    var datas = await TambolaModel.find();
   var generatedRandom = tambola.getDrawSequence();
   socket.on("starts", async (data) => {
+
+
+
+
+    const quickfiveCheck = async(data, anouncedlist) => {
+
+      var winnerlist = [];
+      for (var i = 0; i < data.length; i++) {
+       
+       var count = [];
+        const flat = data[i].ticket.flat();
+        let ar = [...new Set(flat)];
+        let unique=ar.filter(item=>item!==0)
+        for (var r = 0; r < unique.length; r++) {
+          if (anouncedlist.includes(unique[r])) {
+            count.push(unique[r]);
+          }
+          if (count.length === 5) {
+            winnerlist.push([data[i].username,data[i].id]);
+            break;
+          }
+        }
+       
+      }
+      q5winner = [...winnerlist];
+    if(q5winner.length>0){
+      await sleep(3000);
+ wontime=true;
+      socket.broadcast.emit('q5taken');
+      await sleep(5000);
+    }
+    };
+    const fourcornerwinnercheck=async(data,anouncedlist)=>{
+      var winnerlist = [];
+    
+      for (var i = 0; i < data.length; i++) {
+       var  countfourcorner = [];
+        const flat = data[i].ticket.flat(1);
+        let unique = [...new Set(flat)];
+        let index = unique.indexOf(0);
+        if (index > -1) {
+          unique.splice(index, 1);
+        }
+          if ( anouncedlist.includes(unique[0])) 
+          {
+          countfourcorner.push(unique[0])
+          }
+          if ( anouncedlist.includes(unique[10])) 
+          {
+          countfourcorner.push(unique[10])
+          }
+          if ( anouncedlist.includes(unique[4])) 
+          {
+          countfourcorner.push(unique[4])
+          }
+          if ( anouncedlist.includes(unique[14])) 
+          {
+          countfourcorner.push(unique[14])
+          }
+          
+          if (countfourcorner.length === 4) {
+            winnerlist.push([data[i].username,data[i].id]);
+            break;
+          }
+      }
+     fourcornerWinner = [...winnerlist];
+     if(fourcornerWinner.length>0){
+      await sleep(3000);
+  wontime=true
+      socket.broadcast.emit('fourcornertaken');
+      await sleep(5000);
+    }
+    }
+    const firstlinewinnercheck =async (data, anouncedlist) => {
+      var winnerlist = [];
+    
+      for (var i = 0; i < data.length; i++) {
+       var countfirst = [];
+        const flat = data[i].ticket.flat(1);
+        let unique = [...new Set(flat)];
+        let index = unique.indexOf(0);
+        if (index > -1) {
+          unique.splice(index, 1);
+        }
+    
+        for (var r = 0; r < 5; r++) {
+          if (
+            anouncedlist.includes(unique[r])
+          ) {
+            countfirst.push(unique[r])
+          }
+          if (countfirst.length === 5) {
+            winnerlist.push([data[i].username,data[i].id]);
+            break;
+          }
+        }
+      }
+      firstlineWinner = [...winnerlist];
+      if(firstlineWinner.length>0){
+      await sleep(3000);
+wontime=true
+        socket.broadcast.emit('firstlinetaken');
+        await sleep(5000);
+      }
+    };
+    const secondlinewinnercheck =async (data, anouncedlist) => {
+      var winnerlist = [];
+    
+      for (var i = 0; i < data.length; i++) {
+       var  countsecond = [];
+        const flat = data[i].ticket.flat(1);
+        let unique = [...new Set(flat)];
+        let index = unique.indexOf(0);
+        if (index > -1) {
+          unique.splice(index, 1);
+        }
+    
+        for (var r = 5; r < 10; r++) {
+          if (
+            anouncedlist.includes(unique[r])
+          ) {
+            countsecond.push(unique[r])
+          }
+          if (countsecond.length === 5) {
+            winnerlist.push([data[i].username,data[i].id]);
+            break;
+          }
+        }
+      }
+      secondlineWinner = [...winnerlist];
+      if(secondlineWinner.length>0){
+      await sleep(3000);
+      wontime=true
+        socket.broadcast.emit('secondlinetaken');
+        await sleep(5000);
+      }
+    };
+    const thirdlinewinnercheck = async(data, anouncedlist) => {
+      var winnerlist = [];
+    
+      for (var i = 0; i < data.length; i++) {
+        var countthird = [];
+        const flat = data[i].ticket.flat(1);
+        let unique = [...new Set(flat)];
+        let index = unique.indexOf(0);
+        if (index > -1) {
+          unique.splice(index, 1);
+        }
+    
+        for (var r = 10; r < 15; r++) {
+          if (
+            anouncedlist.includes(unique[r])
+          ) {
+            countthird.push(unique[r])
+          }
+          if (countthird.length === 5) {
+            winnerlist.push([data[i].username,data[i].id]);
+            break;
+          }
+        }
+      }
+      thirdlineWinner = [...winnerlist];
+      if(thirdlineWinner.length>0){
+      await sleep(3000);
+ wontime=true
+        socket.broadcast.emit('thirdlinetaken');
+        await sleep(5000);
+      }
+    };
+    const firstFullhousecheck=async(data,anouncedlist)=>{
+      var winnerlist = [];
+    
+      for (var i = 0; i < data.length; i++) {
+        var countfull = [];
+        const flat = data[i].ticket.flat(1);
+        let unique = [...new Set(flat)];
+        let index = unique.indexOf(0);
+        if (index > -1) {
+          unique.splice(index, 1);
+        }
+    
+        for (var r = 0; r < 15; r++) {
+          if (
+            anouncedlist.includes(unique[r])
+          ) {
+            countfull.push(unique[r])
+          }
+          if (countfull.length === 15) {
+            winnerlist.push([data[i].username,data[i].id]);
+            break;
+          }
+        }
+      }
+     fullhouseWinner = [...winnerlist];
+     if(fullhouseWinner.length>0){
+      await sleep(3000);
+      wontime=true
+      socket.broadcast.emit('fullhousetaken');
+      await sleep(5000);
+    }
+    }
+    const secondFullhousecheck=async(data,anouncedlist)=>{
+      var winnerlist = [];
+      for (var i = 0; i < data.length; i++) {
+        var countfull = [];
+        const flat = data[i].ticket.flat(1);
+        let unique = [...new Set(flat)];
+        let index = unique.indexOf(0);
+        if (index > -1) {
+          unique.splice(index, 1);
+        }
+    
+        for (var r = 0; r < 15; r++) {
+          if (
+            anouncedlist.includes(unique[r])
+          ) {
+            countfull.push(unique[r])
+          }
+          if (countfull.length === 15) {
+            winnerlist.push([data[i].username,data[i].id]);
+            break;
+          }
+        }
+      }
+     secondfullhouseWinner = [...winnerlist];
+     if(secondfullhouseWinner.length>0){
+      await sleep(3000);
+wontime=true
+      socket.broadcast.emit('secondfullhousetaken');
+      await sleep(5000);
+    }
+    }
+    const thirdFullhousecheck=async(data,anouncedlist)=>{
+      var winnerlist = [];
+      for (var i = 0; i < data.length; i++) {
+        var countfull = [];
+        const flat = data[i].ticket.flat(1);
+        let unique = [...new Set(flat)];
+        let index = unique.indexOf(0);
+        if (index > -1) {
+          unique.splice(index, 1);
+        }
+    
+        for (var r = 0; r < 15; r++) {
+          if (
+            anouncedlist.includes(unique[r])
+          ) {
+            countfull.push(unique[r])
+          }
+          if (countfull.length === 15) {
+            winnerlist.push([data[i].username,data[i].id]);
+            break;
+          }
+        }
+      }
+     thirdfullhouseWinner = [...winnerlist];
+     if(thirdfullhouseWinner.length>0){
+      await sleep(3000);
+      wontime=true
+      socket.broadcast.emit('thirdfullhousetaken');
+      await sleep(5000);
+    }
+    }
+    
+    let winnercheck = (data,list) => {
+      if (q5winner.length===0) {
+      quickfiveCheck(data,list);
+      }
+      if (fourcornerWinner.length===0){
+         fourcornerwinnercheck(data,list);
+      }
+    
+      if (firstlineWinner.length===0){
+         firstlinewinnercheck(data,list);
+        firstFullhousecheck(data,list);
+      }
+    
+      if (secondlineWinner.length===0){
+        secondlinewinnercheck(data,list);
+        firstFullhousecheck(data,list);
+    
+      }
+    
+      if (thirdlineWinner.length===0){
+          thirdlinewinnercheck(data,list);
+       firstFullhousecheck(data,list);
+    
+      }
+    
+      if(firstlineWinner.length!=0 && secondlineWinner.length!==0 && thirdlineWinner.length!==0&&fullhouseWinner.length===0){
+         firstFullhousecheck(data,list);
+      }
+    
+    
+    
+      if(firstlineWinner.length!=0 && secondlineWinner.length!==0 && thirdlineWinner.length!==0 && fullhouseWinner.length!==0 && secondfullhouseWinner.length===0 ){
+    var finishedlist=[]
+    finalnewlist=data;
+    
+    
+    
+    fullhouseWinner.map((item)=>{
+          //  finalnewlist = data.filter(s=>s.id!==item[1])
+           finishedlist.push(item[1])
+    
+        })
+    finishedlist.map(item=>{
+      finalnewlist=finalnewlist.filter(s=>s.id!==item);
+    
+    })
+    
+        secondFullhousecheck(finalnewlist,list);
+      }
+    
+    
+      if(fullhouseWinner.length!==0 && secondfullhouseWinner.length!==0 && thirdfullhouseWinner.length===0 ){
+       console.log('third check')
+        var final=[]
+    var finishedlist=[]
+    
+        finalnewlist=data;
+        fullhouseWinner.map((item)=>{
+          //  finalnewlist = data.filter(s=>s.id!==item[1])
+           finishedlist.push(item[1])
+        })
+        secondfullhouseWinner.map(item=>{
+          finishedlist.push(item[1])
+        })
+        finishedlist.map(item=>{
+          finalnewlist=finalnewlist.filter(s=>s.id!==item);
+        
+        })
+    
+    
+         thirdFullhousecheck(finalnewlist,list);
+       }
+    
+    return {q5winner,tempwinner,fourcornerWinner,firstlineWinner,secondlineWinner,thirdlineWinner,fullhouseWinner,secondfullhouseWinner,thirdfullhouseWinner}
+    };
+
+
+
+
+
+
     if (data === false) {
       await sleepstop();
     }
@@ -510,11 +567,14 @@ io.on("connection",async (socket) => {
   console.log('game started')
 
       for (var i = 0; i < 91; i++) {
-        
+    
         await sleep(9000);
         var item = generatedRandom[i];
         list.push(item);
         if (i < 90) {
+          if(wontime){
+            await sleep(3000);
+          }
           socket.emit("number", item, list);
           socket.broadcast.emit("number", item, list);
           if (i === 0) {
@@ -536,7 +596,7 @@ io.on("connection",async (socket) => {
             );
           }
           
-         
+          wontime=false
           const winner=winnercheck(datas,list);
          
 
@@ -559,7 +619,7 @@ io.on("connection",async (socket) => {
             thirdfullhouseWinner:thirdfullhouseWinner
           })
           try {
-          winnersave.save();
+          // winnersave.save();
           socket.broadcast.emit('gamefinished');
 
           } catch (e) {

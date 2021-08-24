@@ -4,7 +4,7 @@ const mongoose =require('mongoose')
 
 const PrivateSchema= new mongoose.Schema({
   
-    key:Number
+    key:String
 })
 
 const model=mongoose.model('privatekey',PrivateSchema)

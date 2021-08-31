@@ -12,7 +12,16 @@ const ListModel = require("./models/ticketList");
 const WinnerModel=require('./models/winnerlist');
 const TimingModel=require('./models/GameTiming');
 var tambola = require("tambola");
-
+var anouncement=[
+  7,  5, 19, 50, 55,  1, 78, 59, 79, 57, 40, 45,
+ 17, 28, 74, 89, 88, 23, 35, 44, 32, 30, 75, 46,
+ 73, 65, 49, 29, 76, 53, 34, 10, 47, 24, 48, 31,
+ 52, 66, 56, 58, 84, 18, 82, 16, 38, 87,  8, 54,
+ 77, 61, 62, 67, 22, 13, 72, 37, 71, 33,  2, 51,
+ 90, 69,  9, 21, 26,  3, 85, 39, 81,  4, 42, 12,
+ 43, 41, 70, 27, 36, 15, 20, 11, 68, 64, 80, 25,
+ 63, 14,  6, 60, 86, 83
+]
 var finalnewlist=[]
 const server=http.createServer(app)
 
@@ -213,7 +222,6 @@ io.on("connection",async (socket) => {
  var wontime=false;
   var list = [];
    var datas = await TambolaModel.find();
-  var generatedRandom = tambola.getDrawSequence();
   socket.on("starts", async (data) => {
 
 
@@ -565,10 +573,13 @@ wontime=true
     }
     if (data === true) {
   console.log('game started')
+  // var generatedRandom = tambola.getDrawSequence();
+  var generatedRandom=anouncement;
+
+  // console.log(generatedRandom)
 
       for (var i = 0; i < 91; i++) {
     
-        await sleep(9000);
         var item = generatedRandom[i];
         list.push(item);
         if (i < 90) {
@@ -628,6 +639,9 @@ wontime=true
           }
           break;
         }
+
+        
+        await sleep(9000);
       }
     }
 
@@ -640,7 +654,7 @@ wontime=true
   process.on('beforeExit',()=>{
     const msg='server getting restarted';
     socket.broadcast.emit('serverdown',msg);
-  })
+  } )
   
 });
 

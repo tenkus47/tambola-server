@@ -115,7 +115,7 @@ app.get('/anounced',async(req,res)=>{
 })
 
 app.get("/", (req, res) => {
-  res.send("this is backend");
+  res.send("this is backend last");
 });
 app.get('/Timings',async(req,res)=>{
 const data=await TimingModel.find();

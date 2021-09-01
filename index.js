@@ -563,11 +563,8 @@ wontime=true
       await sleepstop();
     }
     if (data === true) {
-  console.log('game started')
   var generatedRandom = tambola.getDrawSequence();
-  // var generatedRandom=anouncement;
 
-  // console.log(generatedRandom)
 
       for (var i = 0; i < 91; i++) {
     
@@ -588,7 +585,6 @@ wontime=true
             try {
               listmodel.save();
             } catch (e) {
-              console.log("error");
               res.send(e);
             }
           } else {
@@ -606,7 +602,6 @@ wontime=true
         
           
         } else {
-          console.log("game done");
         }
         if(thirdfullhouseWinner.length!==0){
           const winnersave=new WinnerModel({
@@ -625,14 +620,12 @@ wontime=true
           socket.broadcast.emit('gamefinished');
 
           } catch (e) {
-            console.log("error");
-            // res.send(e);
           }
           break;
         }
 
         
-        await sleep(9000);
+        await sleep(8000);
       }
     }
 
@@ -649,8 +642,7 @@ wontime=true
   
 });
 
-
-console.log('connected')});
+});
 
 con.on('disconnect',()=>{
   console.log('disconnected')

@@ -7,15 +7,7 @@ const TambolaSchema= new mongoose.Schema({
         type:Date,
         default:Date.now()
     },
-    quickfiveWinner:[],
-    fourcornerWinner:[],
-    temperatureWinner:[],
-    firstlineWinner:[],
-    secondlineWinner:[],
-    thirdlineWinner:[],
-    fullhouseWinner:[],
-    secondfullhouseWinner:[],
-    thirdfullhouseWinner:[]
+    winnerlist:[]
 })
 
 const model=mongoose.model('winnerlist',TambolaSchema)

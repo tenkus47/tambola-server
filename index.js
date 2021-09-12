@@ -22,6 +22,8 @@ const io = require("socket.io")(server, {
   },
 });
 
+
+
 var timeout = null;
 let sleep = (ms) =>
   new Promise((resolve) => (timeout = setTimeout(resolve, ms)));
@@ -38,7 +40,7 @@ var thirdlineWinner = [];
 var fullhouseWinner = [];
 var secondfullhouseWinner=[];
 var thirdfullhouseWinner=[];
-
+var winner=[]
 
 
 mongoose.connect(process.env.MONGOURL, {
@@ -214,9 +216,6 @@ io.on("connection",async (socket) => {
   var list = [];
    var datas = await TambolaModel.find();
   socket.on("starts", async (data) => {
-
-
-
 
     const quickfiveCheck = async(data, anouncedlist) => {
 
@@ -478,45 +477,44 @@ wontime=true
     }
     }
     
-    let winnercheck = (data,list) => {
-      if (q5winner.length===0) {
+    let winnercheck = (data,list,listing=[]) => {
+      if (q5winner.length===0&& listing.includes('Quick Five')) {
       quickfiveCheck(data,list);
       }
-      if (fourcornerWinner.length===0){
+      if (fourcornerWinner.length===0 &&  listing.includes('Four Corners')){
          fourcornerwinnercheck(data,list);
       }
     
-      if (firstlineWinner.length===0){
+      if (firstlineWinner.length===0&&  listing.includes('Top Line')){
          firstlinewinnercheck(data,list);
         firstFullhousecheck(data,list);
       }
     
-      if (secondlineWinner.length===0){
+      if (secondlineWinner.length===0&&  listing.includes('Middle Line')){
         secondlinewinnercheck(data,list);
         firstFullhousecheck(data,list);
     
       }
     
-      if (thirdlineWinner.length===0){
+      if (thirdlineWinner.length===0 &&  listing.includes('Bottom Line')){
           thirdlinewinnercheck(data,list);
        firstFullhousecheck(data,list);
     
       }
     
-      if(firstlineWinner.length!=0 && secondlineWinner.length!==0 && thirdlineWinner.length!==0&&fullhouseWinner.length===0){
+      if(firstlineWinner.length!=0 && secondlineWinner.length!==0 && thirdlineWinner.length!==0&&fullhouseWinner.length===0 &&  listing.includes('Fullhouse')){
          firstFullhousecheck(data,list);
       }
     
     
     
-      if(firstlineWinner.length!=0 && secondlineWinner.length!==0 && thirdlineWinner.length!==0 && fullhouseWinner.length!==0 && secondfullhouseWinner.length===0 ){
+      if(firstlineWinner.length!=0 && secondlineWinner.length!==0 && thirdlineWinner.length!==0 && fullhouseWinner.length!==0 && secondfullhouseWinner.length===0 &&  listing.includes('Second Fullhouse')){
     var finishedlist=[]
     finalnewlist=data;
     
     
     
     fullhouseWinner.map((item)=>{
-          //  finalnewlist = data.filter(s=>s.id!==item[1])
            finishedlist.push(item[1])
     
         })
@@ -529,7 +527,7 @@ wontime=true
       }
     
     
-      if(fullhouseWinner.length!==0 && secondfullhouseWinner.length!==0 && thirdfullhouseWinner.length===0 ){
+      if(fullhouseWinner.length!==0 && secondfullhouseWinner.length!==0 && thirdfullhouseWinner.length===0 &&  listing.includes('Third Fullhouse')){
        console.log('third check')
         var final=[]
     var finishedlist=[]
@@ -551,7 +549,16 @@ wontime=true
          thirdFullhousecheck(finalnewlist,list);
        }
     
-    return {q5winner,tempwinner,fourcornerWinner,firstlineWinner,secondlineWinner,thirdlineWinner,fullhouseWinner,secondfullhouseWinner,thirdfullhouseWinner}
+    return [{name:'Quick Five',list:q5winner},
+    {name:'Temperature',list:tempwinner},
+    {name:'Four Corners',list:fourcornerWinner},
+    {name:'Top Line',list:firstlineWinner},
+    {name:'Middle Line',list:secondlineWinner},
+    {name:'Bottom Line',list:thirdlineWinner},
+    {name:'Fullhouse',list:fullhouseWinner},
+    {name:'Second Fullhouse',list:secondfullhouseWinner},
+    {name:'Third Fullhouse',list:thirdfullhouseWinner}
+  ]
     };
 
 
@@ -559,13 +566,15 @@ wontime=true
 
 
 
-    if (data === false) {
+    if (data?.condition === false) {
       await sleepstop();
     }
-    if (data === true) {
+    
+  console.log('connected',socket.id)
+    if (data?.condition === true) {
   var generatedRandom = tambola.getDrawSequence();
-
-
+  console.log('game started')
+  var listing=data?.listing
       for (var i = 0; i < 91; i++) {
     
         var item = generatedRandom[i];
@@ -595,7 +604,7 @@ wontime=true
           }
           
           wontime=false
-          const winner=winnercheck(datas,list);
+          winner=winnercheck(datas,list,listing);
          
 
           socket.broadcast.emit('winnerlist',winner)
@@ -605,15 +614,7 @@ wontime=true
         }
         if(thirdfullhouseWinner.length!==0){
           const winnersave=new WinnerModel({
-            quickfiveWinner:q5winner,
-            fourcornerWinner:fourcornerWinner,
-            temperatureWinner:tempwinner,
-            firstlineWinner:firstlineWinner,
-            secondlineWinner:secondlineWinner,
-            thirdlineWinner:thirdlineWinner,
-            fullhouseWinner:fullhouseWinner,
-            secondfullhouseWinner:secondfullhouseWinner,
-            thirdfullhouseWinner:thirdfullhouseWinner
+           winnerlist:winner
           })
           try {
           winnersave.save();
@@ -630,15 +631,14 @@ wontime=true
     }
 
   });
-  
+  socket.on('disconnect',()=>{
+    console.log('disconnected',socket.id)
+  })
   socket.on("message",(message)=>{
     console.log(message)
      socket.broadcast.emit('gotoend' ,message);
   })
-  process.on('beforeExit',()=>{
-    const msg='server getting restarted';
-    socket.broadcast.emit('serverdown',msg);
-  } )
+
   
 });
 

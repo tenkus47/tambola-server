@@ -3,7 +3,6 @@ const mongoose =require('mongoose')
 
 
 const TimingSchema= new mongoose.Schema({
-  
     startTime:Date,
 })
 

@@ -1,10 +1,10 @@
-const uniqueArraymaker = (data) => {
-  const flat = data.flat(1);
+const uniqueArraymaker = (data=[]) => {
+  const flat = data?.flat(1);
   let unique = [...new Set(flat)];
 
-  let index = unique.indexOf(0);
+  let index = unique?.indexOf(0);
   if (index > -1) {
-    unique.splice(index, 1);
+    unique?.splice(index, 1);
   }
   return unique;
 };
@@ -255,8 +255,8 @@ const thirdFullhousecheck = async (data, anouncedlist) => {
   var winnerlist = [];
   for (var i = 0; i < data.length; i = 3 + i) {
     if (
-      data[i].mobile === data[i + 1].mobile &&
-      data[i + 1].mobile === data[i + 2].mobile
+      data[i]?.mobile === data[i + 1]?.mobile &&
+      data[i + 1]?.mobile === data[i + 2]?.mobile
     ){
    
     const ticket1 = uniqueArraymaker(data[i]?.ticket);
@@ -283,12 +283,12 @@ const thirdFullhousecheck = async (data, anouncedlist) => {
 
   for (var i = 0; i < data.length; i = i + 6) {
   if (
-    data[i].mobile === data[i + 1].mobile &&
-    data[i + 1].mobile === data[i + 2].mobile &&
-    data[i + 2].mobile === data[i + 3].mobile &&
-    data[i + 3].mobile === data[i + 4].mobile &&
-    data[i + 4].mobile === data[i + 5].mobile &&
-    data[i + 5].mobile === data[i + 6].mobile
+    data[i]?.mobile === data[i + 1]?.mobile &&
+    data[i + 1]?.mobile === data[i + 2].mobile &&
+    data[i + 2]?.mobile === data[i + 3].mobile &&
+    data[i + 3]?.mobile === data[i + 4].mobile &&
+    data[i + 4]?.mobile === data[i + 5].mobile &&
+    data[i + 5]?.mobile === data[i + 6].mobile
   ) {
     const ticket1 = uniqueArraymaker(data[i]?.ticket);
     const ticket6 = uniqueArraymaker(data[i + 5]?.ticket); 
